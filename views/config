@@ -1,0 +1,3 @@
+mail_smtp          : smtp.yourserver.com
+mail_smtp_options  : { "secure": false, "port": 25, "user": "", "password": "", "token": "OAuth 2.0 Token" }
+mail_from          : noreply@totaljs.com

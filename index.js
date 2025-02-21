@@ -1,24 +1,34 @@
-const total4 = require('total4');
+require('total4');
+const nodemailer = require('nodemailer');
 
-const framework = new total4.Application();
+PORT = 8000;
 
-framework.route('/send', function($) {
-    const Mail = require('total4/mail');
-    const email = new Mail();
+// Configurar el transporte SMTP con MailHog
+const transporter = nodemailer.createTransport({
+    host: 'localhost',
+    port: 1025,
+    secure: false
+});
 
-    email.to = 'destinatario@example.com';
-    email.from = 'remitente@example.com';
-    email.subject = 'Correo de prueba desde Total4';
-    email.body = 'Este es un mensaje de prueba enviado desde Total4 usando MailHog.';
+// Ruta para enviar un correo
+ROUTE('GET /send-email', function() {
+    let self = this;
 
-    email.send(err => {
-        if (err) {
-            $.callback(err);
+    let mailOptions = {
+        from: 'noreply@example.com',
+        to: 'test@local.com',
+        subject: 'Correo de prueba',
+        text: '¡Hola! Este es un correo de prueba enviado desde Total.js usando MailHog.'
+    };
+
+    transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+            self.json({ status: 'error', message: error.toString() });
         } else {
-            $.success();
+            self.json({ status: 'success', message: 'Correo enviado correctamente', info });
         }
     });
 });
 
-framework.start(8000);
-console.log('Servidor corriendo en http://localhost:8000');
+// Iniciar el servidor
+HTTP('debug');
