@@ -2,7 +2,21 @@
 	"routes": [
 		{
 			"method": "GET",
-			"url": "/send-email/"
+			"url": "/emails/"
+		},
+		{
+			"method": "GET",
+			"url": "/"
+		},
+		{
+			"method": "GET",
+			"url": "/open/{id}/",
+			"params": "id:string"
+		},
+		{
+			"method": "GET",
+			"url": "/click/{id}/",
+			"params": "id:string"
 		}
 	]
 }

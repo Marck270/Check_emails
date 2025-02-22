@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Correos</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h2>Enviar un Correo</h2>
+    <form id="emailForm">
+        <label>Para:</label>
+        <input type="email" id="to" required><br><br>
+        <label>Asunto:</label>
+        <input type="text" id="subject" required><br><br>
+        <label>Mensaje:</label><br>
+        <textarea id="text" required></textarea><br><br>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <h2>Correos Recibidos</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Correo</th>
+                <th>Abierto</th>
+                <th>Click</th>
+            </tr>
+        </thead>
+        <tbody id="emailTable">
+        </tbody>
+    </table>
+
+    <script>
+        function fetchEmails() {
+            axios.get("/emails")
+                .then(response => {
+                    const emails = response.data;
+                    const emailTable = document.getElementById("emailTable");
+                    emailTable.innerHTML = "";
+
+                    emails.forEach(email => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${email.from}</td>
+                            <td>${email.opened ? "✅" : "❌"}</td>
+                            <td>${email.clicked ? "✅" : "❌"}</td>
+                        `;
+                        emailTable.appendChild(row);
+                    });
+                })
+                .catch(error => console.error("Error al obtener correos:", error));
+        }
+
+        // Cargar correos al inicio
+        fetchEmails();
+
+        // Enviar un correo desde el formulario
+        document.getElementById("emailForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const to = document.getElementById("to").value;
+            const subject = document.getElementById("subject").value;
+            const text = document.getElementById("text").value;
+
+            axios.post("/send-email", { to, subject, text })
+                .then(response => {
+                    alert("Correo enviado correctamente");
+                    fetchEmails();
+                })
+                .catch(error => console.error("Error al enviar correo:", error));
+        });
+
+        // Refrescar la tabla cada 5 segundos
+        setInterval(fetchEmails, 5000);
+    </script>
+</body>
+</html>
